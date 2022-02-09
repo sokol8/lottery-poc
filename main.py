@@ -88,7 +88,6 @@ def test_statis_distribution_multiple_intervals():
 	# PRIZES
 	amount_of_prizes_intervas_array = [round(total_amount_of_prizes/time_intervals_count) for x in range(0, time_intervals_count)]
 
-
 	# USERS
 	#amount_of_users_intervals_array = [round(total_amount_of_users_day/time_intervals_count) for x in range(0, time_intervals_count)]
 
@@ -116,6 +115,45 @@ def test_statis_distribution_multiple_intervals():
 
 ######### MAIN CODE #########
 
+# MAIN SETTINGS
+time_intervals_count = 24 #hours
+total_amount_of_prizes = 100 #total prizes per 24h
+total_amount_of_users_day = 24000 #now isn't used
+
+# PRIZES
+amount_of_prizes_intervas_array = [round(total_amount_of_prizes/time_intervals_count) for x in range(0, time_intervals_count)]
+prizes_given_counter_array = [0 for x in range(0, time_intervals_count)]
+
+assumed_amount_of_users_intervals_array = [1000, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+actual_amount_of_users_intervals_array = [1496, 1026, 1284, 969, 870, 923, 977, 579, 1347, 656, 984, 1075, 939, 601, 1044, 1324, 634, 616, 518, 1443, 1209, 1306, 1267, 544]
+
+assumed_rng_denominator_array = [0 for i in range(0, time_intervals_count)]
+
+for ti_idx in range(0, time_intervals_count):
+	# Initial lottery based on assumed number of incoming users
+
+	assumed_rng_denominator_array[ti_idx] = round(assumed_amount_of_users_intervals_array[ti_idx]/amount_of_prizes_intervas_array[ti_idx])
+	for i in range(0, actual_amount_of_users_intervals_array[ti_idx]):
+		x = lottery_generator(assumed_rng_denominator_array[ti_idx])
+		if x:
+			prizes_given_counter_array[ti_idx] += 1
+
+	# NOW we have actual users who came - time to update our assumptions
+	if ti_idx < time_intervals_count - 1: #check to avoid out of bounds
+		assumed_amount_of_users_intervals_array[ti_idx + 1] = actual_amount_of_users_intervals_array[ti_idx]
+
+	# and on it goes
+
+for ti_idx in range(0, time_intervals_count):
+	print("ti_idx: {}	ASSUMED #users: {}	ACTUAL #users: {}	prizes_given: {}	ASSUMED prize probability: 1/{}".
+		format(ti_idx, 
+			assumed_amount_of_users_intervals_array[ti_idx], 
+			actual_amount_of_users_intervals_array[ti_idx], 
+			prizes_given_counter_array[ti_idx], 
+			assumed_rng_denominator_array[ti_idx]))
+
+total_prizes_given = sum(prizes_given_counter_array)
+print("total prizes given: {}".format(total_prizes_given))
 
 
 
