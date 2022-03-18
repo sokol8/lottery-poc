@@ -13,7 +13,8 @@ def test_lottery_generator(iterations_limit, denominator):
 			flaseCounter += 1
 
 	print("True count: {} False count: {}".format(trueCounter/iterations_limit, flaseCounter/iterations_limit))
-
+####### END OF FUNCTION ####### 		
+#def test_lottery_generator(iterations_limit, denominator):
 
 
 def lottery_generator(rangeEnd) -> bool:
@@ -23,6 +24,8 @@ def lottery_generator(rangeEnd) -> bool:
 		return True
 	else:
 		return False
+####### END OF FUNCTION ####### 		
+# def lottery_generator(rangeEnd) -> bool:
 
 
 def check_uniform_distribution(rangeStart, rangeEnd, iterations_limit):
@@ -45,6 +48,8 @@ def check_uniform_distribution(rangeStart, rangeEnd, iterations_limit):
 		sum += int_buckets_array[i]
 
 	print('checksum: {}'.format(sum))
+####### END OF FUNCTION ####### 
+#def check_uniform_distribution
 
 
 def test_static_distribution_full_day():
@@ -62,8 +67,11 @@ def test_static_distribution_full_day():
 			prizes_given_counter += 1
 
 	print("amount_of_users_day: {} prizes_given_counter: {}".format(amount_of_users_day, prizes_given_counter))
+####### END OF FUNCTION ####### 
+#def test_static_distribution_full_day():
 
-def test_statis_distribution_multiple_intervals():
+
+def test_stat_distribution_multiple_intervals():
 	#iterations_limit = 10000;
 
 	# rangeStart = 0
@@ -113,28 +121,126 @@ def test_statis_distribution_multiple_intervals():
 	total_prizes_given = sum(prizes_given_counter_array)
 	print("total prizes given: {}".format(total_prizes_given))
 
+####### END OF FUNCTION ####### 
+#def test_stat_distribution_multiple_intervals():
+
+
+# here we have variably amount of intervals 12/24
+# (Probablity) = X_users / N_prizes
+# as N_prizes per interval is predetermined and X_users is changing, and estimated
+# we get variable probability dependent on Number X_users of users
+def test_fixed_prizes_distribution():	
+	# MAIN SETTINGS
+	time_intervals_count = 12 #hours
+	total_amount_of_prizes = 100 #total prizes per 24h
+	total_amount_of_users_day = 24000 #now isn't used
+
+	# PRIZES
+	amount_of_prizes_intervas_array = [round(total_amount_of_prizes/time_intervals_count) for x in range(0, time_intervals_count)]
+	prizes_given_counter_array = [0 for x in range(0, time_intervals_count)]
+
+	assumed_amount_of_users_intervals_array = [1000, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+
+	## 12 intervals - by-hourly
+	actual_amount_of_users_intervals_array = [616, 821, 941, 938, 1010, 1118, 1498, 1001, 1462, 1311, 1150, 844]
+
+	## 24 intervals - hourly
+	#actual_amount_of_users_intervals_array = [1496, 1026, 1284, 969, 870, 923, 977, 579, 1347, 656, 984, 1075, 939, 601, 1044, 1324, 634, 616, 518, 1443, 1209, 1306, 1267, 544]
+
+	assumed_rng_denominator_array = [0 for i in range(0, time_intervals_count)]
+
+	for ti_idx in range(0, time_intervals_count):
+		# Initial lottery based on assumed number of incoming users
+
+		assumed_rng_denominator_array[ti_idx] = round(assumed_amount_of_users_intervals_array[ti_idx]/amount_of_prizes_intervas_array[ti_idx])
+
+		
+		# if we try to FIX probability and variate # of prizes
+
+
+		for i in range(0, actual_amount_of_users_intervals_array[ti_idx]):
+			x = lottery_generator(assumed_rng_denominator_array[ti_idx])
+			if x:
+				prizes_given_counter_array[ti_idx] += 1
+
+		# NOW we have actual users who came - time to update our assumptions
+		if ti_idx < time_intervals_count - 1: #check to avoid out of bounds
+			assumed_amount_of_users_intervals_array[ti_idx + 1] = actual_amount_of_users_intervals_array[ti_idx]
+
+		# and on it goes
+
+	for ti_idx in range(0, time_intervals_count):
+		print("ti_idx: {}	ASSUMED #users: {}	ACTUAL #users: {}	prizes_given: {}			ASSUMED prize probability: 1/{}".
+			format(ti_idx, 
+				assumed_amount_of_users_intervals_array[ti_idx], 
+				actual_amount_of_users_intervals_array[ti_idx], 
+				prizes_given_counter_array[ti_idx], 
+				assumed_rng_denominator_array[ti_idx]))
+
+	total_prizes_given = sum(prizes_given_counter_array)
+	print("total prizes given: {}".format(total_prizes_given))
+####### END OF FUNCTION ####### 
+#def test_fixed_prizes_distribution():	
+
+
 ######### MAIN CODE #########
 
 # MAIN SETTINGS
-time_intervals_count = 24 #hours
+time_intervals_count = 12 #hours - interval per 2h
 total_amount_of_prizes = 100 #total prizes per 24h
-total_amount_of_users_day = 24000 #now isn't used
+total_amount_of_users_day = 12000 #now isn't used
 
-# PRIZES
+
+# so we assume that 
+
+# NOW We FIX PRIZES
 amount_of_prizes_intervas_array = [round(total_amount_of_prizes/time_intervals_count) for x in range(0, time_intervals_count)]
-prizes_given_counter_array = [0 for x in range(0, time_intervals_count)]
+prizes_given_counter_array = [0 for x in range(0, time_intervals_count)] #
 
-assumed_amount_of_users_intervals_array = [1000, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
-actual_amount_of_users_intervals_array = [1496, 1026, 1284, 969, 870, 923, 977, 579, 1347, 656, 984, 1075, 939, 601, 1044, 1324, 634, 616, 518, 1443, 1209, 1306, 1267, 544]
+# we ASSUME amount of USERS on the 0's interval
+#assumed_amount_of_users_intervals_array = [1000, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
 
+assumed_amount_of_users_intervals_array = [20000, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+
+# HISTORICAL DATA
+yestarday_actual_amount_of_users_intervals_array = [600, 721, 981, 900, 1110, 1218, 1398, 1051, 1662, 1211, 1050, 944]
+yesterday_total_users = sum(yestarday_actual_amount_of_users_intervals_array)
+yesterday_rng_denominator = round(yesterday_total_users / total_amount_of_prizes)
+
+## 12 intervals - by-hourly - INPUT of the system
+#actual_amount_of_users_intervals_array = [616, 821, 941, 938, 1010, 1118, 1498, 1001, 1462, 1311, 1150, 844]
+actual_amount_of_users_intervals_array = [20000, 2000, 1000, 10000, 20000, 30000, 2000, 10000, 10000, 25000, 10000, 8000]
+
+# INIT WITH ZEROS
 assumed_rng_denominator_array = [0 for i in range(0, time_intervals_count)]
 
-for ti_idx in range(0, time_intervals_count):
-	# Initial lottery based on assumed number of incoming users
+# VERSION 1
+# here we have variably amount of users per intervals 12/24
+# Probablity = N_prizes / X_users
+# (PRNG_denominator) = X_users / N_prizes
+# as N_prizes per interval is predetermined and X_users is changing, and estimated
+# we get variable probability dependent on Number X_users of users
 
-	assumed_rng_denominator_array[ti_idx] = round(assumed_amount_of_users_intervals_array[ti_idx]/amount_of_prizes_intervas_array[ti_idx])
+# VERSION 2
+# here we have variably amount of users per intervals 12/24
+# IF We want to maintain probability and "fairness" of the lottery through intervals of the same day
+# we need to Fix probability of Winning based on
+# - our best guess OR
+# - yesterdays data
+# - other historical data
+# and change amount of prizes givne per time interval BASED on Probability
+
+for ti_idx in range(0, time_intervals_count):
+	
+	# Initial lottery based on assumed number of incoming users
+	#assumed_rng_denominator_array[ti_idx] = round(assumed_amount_of_users_intervals_array[ti_idx]/amount_of_prizes_intervas_array[ti_idx])
+
+	
+	# if we try to FIX probability and variate # of prizes
+
+
 	for i in range(0, actual_amount_of_users_intervals_array[ti_idx]):
-		x = lottery_generator(assumed_rng_denominator_array[ti_idx])
+		x = lottery_generator(yesterday_rng_denominator)
 		if x:
 			prizes_given_counter_array[ti_idx] += 1
 
@@ -145,15 +251,22 @@ for ti_idx in range(0, time_intervals_count):
 	# and on it goes
 
 for ti_idx in range(0, time_intervals_count):
-	print("ti_idx: {}	ASSUMED #users: {}	ACTUAL #users: {}	prizes_given: {}	ASSUMED prize probability: 1/{}".
+	print("ti_idx: {}	ASSUMED #users: {}	ACTUAL #users: {}	prizes_given: {}		ASSUMED P: 1/{}		ACTUAL P: 1/{}".
 		format(ti_idx, 
 			assumed_amount_of_users_intervals_array[ti_idx], 
 			actual_amount_of_users_intervals_array[ti_idx], 
 			prizes_given_counter_array[ti_idx], 
-			assumed_rng_denominator_array[ti_idx]))
+			yesterday_rng_denominator,
+			round(actual_amount_of_users_intervals_array[ti_idx] / prizes_given_counter_array[ti_idx])))
 
-total_prizes_given = sum(prizes_given_counter_array)
-print("total prizes given: {}".format(total_prizes_given))
+total_prizes = sum(prizes_given_counter_array)
+print("total prizes given: {}".format(total_prizes))
+
+total_users_participated = sum(actual_amount_of_users_intervals_array)
+print("total users participated: {}".format(total_users_participated))
+
+today_rng_denominator = round(sum(actual_amount_of_users_intervals_array) / sum(prizes_given_counter_array))
+print("actual PRNG denominator: {}".format(today_rng_denominator))
 
 
 
